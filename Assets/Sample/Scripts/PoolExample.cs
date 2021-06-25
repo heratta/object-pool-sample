@@ -19,6 +19,8 @@ namespace Sample
         
         public int maxPoolSize = 10;
 
+        public ParticleSystem original;
+
         private IObjectPool<ParticleSystem> _pool;
 
         private IObjectPool<ParticleSystem> Pool
@@ -38,18 +40,11 @@ namespace Sample
 
         private ParticleSystem CreatePooledItem()
         {
-            var go = new GameObject("Pooled Particle System");
-            go.transform.SetParent(transform, false);
-            var ps = go.AddComponent<ParticleSystem>();
+            var ps = Instantiate(original, transform, false);
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-
-            var main = ps.main;
-            main.duration = 1;
-            main.startLifetime = 1;
-            main.loop = false;
-
+            
             // This is used to return ParticleSystems to the pool when they have stopped.
-            var returnToPool = go.AddComponent<ReturnToPool>();
+            var returnToPool = ps.gameObject.AddComponent<ReturnToPool>();
             returnToPool.Pool = Pool;
 
             return ps;
